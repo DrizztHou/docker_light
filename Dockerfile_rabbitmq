@@ -1,0 +1,37 @@
+FROM houzheng/light_redis 
+MAINTAINER Docker johnhouzheng@gmail.com 
+
+# install erlang
+RUN wget http://www.erlang.org/download/otp_src_17.5.tar.gz
+
+RUN tar zxvf otp_src_17.5.tar.gz \
+    && cd otp_src_17.5 \
+    && ./configure \
+    && make \
+    && make install
+
+# install rabbitmq
+RUN wget http://www.rabbitmq.com/releases/rabbitmq-server/v3.5.1/rabbitmq-server-3.5.1.tar.gz
+
+RUN tar zxvf rabbitmq-server-3.5.1.tar.gz \
+    && cd rabbitmq-server-3.5.1 \
+    && make TARGET_DIR=/usr/rabbitmq SBIN_DIR=/usr/rabbitmq/sbin MAN_DIR=/usr/rabbitmq/man DOC_INSTALL_DIR=/usr/rabbitmq/doc \ 
+    && make TARGET_DIR=/usr/rabbitmq SBIN_DIR=/usr/rabbitmq/sbin MAN_DIR=/usr/rabbitmq/man DOC_INSTALL_DIR=/usr/rabbitmq/doc install
+
+# clean 
+RUN rm otp_src_17.5.tar.gz \
+    && rm rabbitmq-server-3.5.1.tar.gz \
+    && rm -r otp_src_17.5 \
+    && rm -r rabbitmq-server-3.5.1 
+
+# prepare
+RUN mkdir /rabbitmqdata \
+    && mkdir /etc/rabbitmq \
+    && chown light:light /rabbitmqdata
+    
+VOLUME /rabbitmqdata
+
+EXPOSE 5672 15672
+
+CMD ["/usr/rabbitmq/sbin/rabbitmq-server"]
+

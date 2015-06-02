@@ -1,0 +1,16 @@
+FROM centos:7.1.1503
+MAINTAINER Docker johnhouzheng@gmail.com
+RUN yum -y install mysql\
+    && yum -y install mariadb-server\
+    && rm -rf /var/lib/mysql\
+    && mkdir /var/lib/mysql
+
+VOLUME /var/lib/mysql
+
+COPY docker-entrypoint.sh /
+
+ENTRYPOINT ["/docker-entrypoint.sh"]
+
+EXPOSE 3306
+
+CMD ["mysql -u root -p"]

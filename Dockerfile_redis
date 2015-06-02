@@ -1,0 +1,28 @@
+FROM centos:7.1.1503
+MAINTAINER Docker johnhouzheng@gmail.com
+# add group and user
+RUN groupadd -r light && useradd -r -g light light
+
+COPY tar /bin/tar
+
+RUN yum update -y
+
+# install redis and dependance app
+RUN yum install -y gcc zip unzip make perl python-setuptools ncurses-devel ncruses-devel wget xmlto 
+
+# install redis
+RUN wget -r --no-parent -A'epel-release-*.rpm' http://dl.fedoraproject.org/pub/epel/7/x86_64/e/
+
+RUN rpm -Uvh dl.fedoraproject.org/pub/epel/7/x86_64/e/epel-release-*.rpm
+
+RUN yum install -y redis
+
+# prepare
+RUN mkdir /redisdata && chown light:light /redisdata   
+
+VOLUME /redisdata
+
+EXPOSE 6379
+
+CMD ["redis-server"]
+
